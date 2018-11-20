@@ -18,10 +18,9 @@ public class Controller implements Runnable {
 
     public Controller(int r){
 
-        //graph setup. should contain at leaast one node
-        setGraph2();
-        startNode = graph.getNode(0);
-        startNode.addAttribute("ui.style", "size: 20;");
+        //graph setup. should contain at least one node
+        createGraph2();
+        setGraph(0);
 
         //robot setup
         this.robots = new HashSet<>();
@@ -67,16 +66,21 @@ public class Controller implements Runnable {
                 .filter(r -> !graphdone || (r.getCurrentNode() != startNode))
                 .forEach(Robot::chooseDirection);
 
-        //moves
+        //moves - based on chalks
         currentNodes.forEach(n -> {
             ArrayList<Visit> chalks = (ArrayList<Visit>) n.getAttribute("chalks");
             chalks.stream()
                     .filter(Visit::isNotFinished)
                     .forEach(v -> {
-                        v.robot.move(v.to);
+                        v.robot.move();
                         v.finish();
                     });
         });
+
+        //robots evaluate
+        robots.stream()
+                .filter(r -> !graphdone || (r.getCurrentNode() != startNode))
+                .forEach(Robot::evaluate);
 
         //labels
         robots.stream()
@@ -101,23 +105,18 @@ public class Controller implements Runnable {
                 .collect(Collectors.joining(","));
     }
 
-    private void setGraph2 (){
-        graph = new SingleGraph("Random");
-        Generator gen = new RandomGenerator(4, false, false);
-        gen.addSink(graph);
-        gen.begin();
-        for(int i=0; i<6; i++)
-            gen.nextEvents();
-        gen.end();
+    private void setGraph (int startNodeIndex){
+
+        startNode = graph.getNode(startNodeIndex);
+        startNode.addAttribute("ui.style", "size: 20;");
 
         //add chalks
         graph.getNodeSet().stream().forEach(n -> n.addAttribute("chalks", new ArrayList<Visit>()));
         //set edges to gray
         graph.getEdgeSet().forEach(e->e.addAttribute("ui.style", "fill-color: rgb(220,220,220);"));
-
     }
 
-    private void setGraph1 (){
+    private void createGraph1(){
         graph = new SingleGraph("Tutorial");
 
         graph.addNode("A" );
@@ -132,13 +131,16 @@ public class Controller implements Runnable {
         graph.addEdge("CD", "C", "D" ,false);
         graph.addEdge("DE", "D", "E" ,false);
         graph.addEdge("DF", "D", "F" ,false);
+    }
 
-        //add chalks
-        graph.getNodeSet().stream().forEach(n -> n.addAttribute("chalks", new ArrayList<Visit>()));
-        //set edges to gray
-        graph.getEdgeSet().forEach(e->e.addAttribute("ui.style", "fill-color: rgb(220,220,220);"));
-
-
+    private void createGraph2 (){
+        graph = new SingleGraph("Random");
+        Generator gen = new RandomGenerator(4, false, false);
+        gen.addSink(graph);
+        gen.begin();
+        for(int i=0; i<6; i++)
+            gen.nextEvents();
+        gen.end();
     }
 
 }

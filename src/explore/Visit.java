@@ -1,26 +1,23 @@
 package explore;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.graphstream.graph.Edge;
 import java.time.Instant;
 
 @Getter
+@Setter
 public class Visit {
     public final Robot robot;
     public final Edge from;
     public final boolean original;
-    public final Edge to;
+    private Edge to;
     private Instant when;
 
-    public Visit(Robot robot, Edge from, Edge to, boolean original){
+    public Visit(Robot robot, Edge from, boolean original){
         this.robot = robot;
         this.from = from;
-        this.to = to;
         this.original = original;
-    }
-
-    public Instant getWhen(){
-        return when;
     }
 
     public boolean isNotFinished(){
