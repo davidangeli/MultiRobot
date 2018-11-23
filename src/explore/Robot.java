@@ -81,14 +81,12 @@ public class Robot {
         chalks.add(currentVisit);
 
         //mark the edge as used
-        if (fromEdge != null) fromEdge.addAttribute("ui.style", "size: 3px;");
+        if (fromEdge != null) EdgeState.VISITED.setEdge(fromEdge);
 
         //if the robot has been here before
         if (lastVisit.isPresent()) {
-            fromEdge.addAttribute("finished", true);
-            fromEdge.addAttribute("ui.style", "fill-color: rgb(205,92,92);");
+            EdgeState.FINISHED.setEdge(fromEdge);
         }
-
     }
 
     /**
@@ -119,7 +117,7 @@ public class Robot {
         //if there's an edge that is not finished and not original entry to any robots
         //prefer the least used edge (by all robots)
         Optional<Edge> to = currentNode.getEdgeSet().stream()
-                .filter(e -> !e.hasAttribute("finished") && !originalEdges.contains(e))
+                .filter(e -> e.getAttribute("state") != EdgeState.FINISHED && !originalEdges.contains(e))
                 .sorted(Comparator.comparing(e -> chalks.stream().filter(v -> v.getTo() != null && v.getTo().equals(e)).count()))
                 .findFirst();
 

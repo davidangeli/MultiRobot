@@ -94,7 +94,8 @@ public class Controller implements Runnable {
     }
 
     private boolean edgesFinished () {
-        return graph.getEdgeSet().stream().allMatch(e -> e.hasAttribute("finished"));
+
+        return graph.getEdgeSet().stream().allMatch(e -> e.hasAttribute("state") && e.getAttribute("state") == EdgeState.FINISHED);
     }
 
     private void setLabel(Node node){
