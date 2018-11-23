@@ -4,13 +4,16 @@ import lombok.Getter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 
-import java.awt.*;
 import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
 
+/**
+ * http://graphstream-project.org/doc/Advanced-Concepts/GraphStream-CSS-Reference/
+ */
 @Getter
 public class Robot {
+
     protected static int idc;
     private final int id;
     private Node currentNode;
@@ -18,22 +21,53 @@ public class Robot {
     private Optional<Visit> lastVisit;
     private Visit currentVisit;
 
+
     public Robot(Node startNode){
         id = ++idc;
         this.currentNode = startNode;
-        evaluate();
+        chalk();
     }
 
-    public void move(){
-        currentNode = currentVisit.getTo().getOpposite(currentNode);
-        fromEdge = currentVisit.getTo();
+    public void moveBack(){
+        if (fromEdge != null) {
+            return;
+        }
+
+        //cleanup1
+        ArrayList<Visit> chalks = currentNode.getAttribute("chalks");
+        chalks.remove(currentVisit);
+        currentVisit.getFromEdgePrevState().setEdge(fromEdge);
+
+        //set - cleanup2
+        currentNode = fromEdge.getOpposite(currentNode);
+        chalks = currentNode.getAttribute("chalks");
+        lastVisit = chalks.stream()
+                .filter(v -> v.robot == this)
+                .sorted(Comparator.comparing(Visit::getWhen).reversed())
+                .findFirst();
+        //there must be a previous visit here
+        if (lastVisit.isPresent()){
+            chalks.remove(lastVisit.get());
+            fromEdge = lastVisit.get().from;
+        }
+
+        //do chalk again
+        chalk();
     }
 
     /**
-     * First part of algorithm, should run right after moving
+     * Moves the robot
      */
-    public void evaluate() {
+    public void moveForward(){
+        currentNode = currentVisit.getTo().getOpposite(currentNode);
+        fromEdge = currentVisit.getTo();
+        chalk();
+    }
 
+    /**
+     * After moving, sets variables, makes evaluation (first part of algorithm)
+     */
+    private void chalk(){
         ArrayList<Visit> chalks = currentNode.getAttribute("chalks");
 
         lastVisit = chalks.stream()
@@ -41,14 +75,20 @@ public class Robot {
                 .sorted(Comparator.comparing(Visit::getWhen).reversed())
                 .findFirst();
 
+        EdgeState prevState = fromEdge == null ? EdgeState.UNVISITED : (EdgeState) fromEdge.getAttribute("state");
+        currentVisit = new Visit (this, fromEdge, !lastVisit.isPresent(), prevState);
+
+        chalks.add(currentVisit);
+
+        //mark the edge as used
+        if (fromEdge != null) fromEdge.addAttribute("ui.style", "size: 3px;");
+
         //if the robot has been here before
         if (lastVisit.isPresent()) {
             fromEdge.addAttribute("finished", true);
             fromEdge.addAttribute("ui.style", "fill-color: rgb(205,92,92);");
         }
 
-        currentVisit = new Visit (this, fromEdge, !lastVisit.isPresent());
-        chalks.add(currentVisit);
     }
 
     /**
@@ -103,3 +143,5 @@ public class Robot {
         return "Robot "+id;
     }
 }
+
+
