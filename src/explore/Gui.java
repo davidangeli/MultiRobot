@@ -14,6 +14,7 @@ public class Gui extends JFrame {
     private JLabel lblSteps;
 
     public Gui (Controller controller){
+        this.setTitle("Angeli-Nyári Multi Robot Graph Exploration");
         this.controller = controller;
         this.kH = new keyHandler();
         this.addKeyListener(kH);
@@ -39,12 +40,16 @@ public class Gui extends JFrame {
         //restart gomb
         JButton btnRestart = new JButton("Újraindít");
         btnRestart.addKeyListener(kH);
-        btnRestart.addActionListener(e -> controller.reset(Integer.parseInt((String)txtNumberOfRobots.getSelectedItem())));
+        btnRestart.addActionListener(e -> {
+            setSteps(0);
+            controller.reset(Integer.parseInt((String)txtNumberOfRobots.getSelectedItem()));
+        });
         //generátor típus
         JLabel lblGeneratorType = new JLabel("Generátor típusa");
         String[] genTypes = new String[] {"Tutorial", "Random", "Lobster"};
         JComboBox<String> cmbGeneratorType = new JComboBox<String>(genTypes);
         cmbGeneratorType.addActionListener(e -> {
+            setSteps(0);
             controller.init((String)cmbGeneratorType.getSelectedItem(), Integer.parseInt((String)txtNumberOfRobots.getSelectedItem()));
             split.setRightComponent(controller.getViewPanel());
         });

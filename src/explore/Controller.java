@@ -46,7 +46,6 @@ public class Controller implements Runnable {
         }
         graph.getNodeSet().forEach(n -> n.removeAttribute("ui.label"));
         setLabel(startNode);
-
         ticks=0;
     }
 
@@ -61,6 +60,7 @@ public class Controller implements Runnable {
         return t.isAlive();
     }
     public void start(){
+        this.stopped.set(false);
         t = new Thread(this);
         t.start();
     }
@@ -226,12 +226,12 @@ public class Controller implements Runnable {
                 return;
             case "Lobster":
                 gen = new LobsterGenerator();
-                depth = 100;
+                depth = 50;
                 break;
             case "Random":
                 default:
                 gen = new RandomGenerator(4, false, false);
-                depth = 6;
+                depth = 3;
                 break;
 
         }
