@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toSet;
  * http://graphstream-project.org/doc/Advanced-Concepts/GraphStream-CSS-Reference/
  */
 @Getter
-public class Robot {
+public class Robot{
 
     protected static int idc;
     private final int id;

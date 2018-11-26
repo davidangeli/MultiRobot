@@ -1,11 +1,13 @@
 package explore;
 
 import org.graphstream.algorithm.generator.Generator;
+import org.graphstream.algorithm.generator.LobsterGenerator;
 import org.graphstream.algorithm.generator.RandomGenerator;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.swingViewer.ViewPanel;
+import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
 import java.util.ArrayList;
@@ -14,17 +16,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class Controller implements Runnable {
-    private final Graph graph;
-    private final ArrayList<Robot> robots;
+    private Graph graph;
+    private ArrayList<Robot> robots;
     private Node startNode;
     private boolean paused = true;
+    private int ticks=0;
+    private Viewer viewer;
+
     public AtomicBoolean stopped;
 
-    public Controller(int r){
+    public Controller(int r, String graphType){
 
         //graph setup. should contain at least one node
         graph = new SingleGraph("MultiRobot");
-        createGraph1();
+        createGraph2(graphType);
         setGraph(0);
 
         //robot setup -startNode should not be null
@@ -33,6 +38,30 @@ public class Controller implements Runnable {
             robots.add(new Robot(startNode));
         }
 
+        stopped = new AtomicBoolean(false);
+    }
+    public void reset(int r) throws Exception {
+        //if (!isFinished() || stopped.get()) return;
+        setGraph(0);
+        robots = new ArrayList<>();
+        for (int i =0; i < r; i++) {
+            robots.add(new Robot(startNode));
+        }
+
+        ticks=0;
+        stopped = new AtomicBoolean(false);
+    }
+    public void reset(String graphType, int r){
+        graph = new SingleGraph("MultiRobot");
+        createGraph2(graphType);
+        setGraph(0);
+
+        robots = new ArrayList<>();
+        for (int i =0; i < r; i++) {
+            robots.add(new Robot(startNode));
+        }
+
+        ticks=0;
         stopped = new AtomicBoolean(false);
     }
 
@@ -56,6 +85,7 @@ public class Controller implements Runnable {
     }
 
     private synchronized void tick () {
+        ticks++;
         //remove labels
         graph.getNodeSet().forEach(n -> n.removeAttribute("ui.label"));
 
@@ -125,8 +155,7 @@ public class Controller implements Runnable {
     }
 
     public ViewPanel getViewPanel(){
-
-        Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         viewer.enableAutoLayout();
         ViewPanel view = viewer.addDefaultView(false);
         return view;
@@ -153,6 +182,7 @@ public class Controller implements Runnable {
         startNode.addAttribute("ui.style", "size: 20;");
 
         //add chalks
+        graph.getNodeSet().stream().forEach(n -> n.removeAttribute("chalks"));
         graph.getNodeSet().stream().forEach(n -> n.addAttribute("chalks", new ArrayList<Visit>()));
         //set edges to gray
         graph.getEdgeSet().forEach(e -> EdgeState.UNVISITED.setEdge(e) );
@@ -174,12 +204,24 @@ public class Controller implements Runnable {
         graph.addEdge("DF", "D", "F" ,false);
     }
 
-    private void createGraph2 (){
-
-        Generator gen = new RandomGenerator(4, false, false);
+    private void createGraph2 (String graphType){
+        Generator gen;
+        int depth =0;
+        switch (graphType)
+        {
+            case "Lobster":
+                gen = new LobsterGenerator();
+                depth = 100;
+                break;
+            case "Random":
+                default:
+                gen = new RandomGenerator(4, false, false);
+                depth = 6;
+                break;
+        }
         gen.addSink(graph);
         gen.begin();
-        for(int i=0; i<6; i++)
+        for(int i=0; i<depth; i++)
             gen.nextEvents();
         gen.end();
     }
