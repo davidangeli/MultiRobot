@@ -54,7 +54,10 @@ public class Gui extends JFrame {
         //start-stop
         JButton btnPause = new JButton("Start / stop");
         btnPause.addKeyListener(kH);
-        btnPause.addActionListener(e -> controller.pause());
+        btnPause.addActionListener(e -> {
+            if (!controller.isRunning()) controller.start();
+            controller.pause();
+        });
 
         settingsPanel.add(lblNumberOfRobots);
         settingsPanel.add(txtNumberOfRobots);

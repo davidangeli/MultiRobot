@@ -23,6 +23,7 @@ public class Controller implements Runnable {
     private boolean paused = true;
     private int ticks=0;
     private Viewer viewer;
+    private Thread t;
 
     public AtomicBoolean stopped = new AtomicBoolean(false);
 
@@ -52,7 +53,14 @@ public class Controller implements Runnable {
         createGraph2(graphType);
         reset(r);
     }
-
+    public boolean isRunning(){
+        if (t == null) return false;
+        return t.isAlive();
+    }
+    public void start(){
+        t = new Thread(this);
+        t.start();
+    }
     @Override
     public void run(){
 
