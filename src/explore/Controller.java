@@ -24,46 +24,33 @@ public class Controller implements Runnable {
     private int ticks=0;
     private Viewer viewer;
 
-    public AtomicBoolean stopped;
+    public AtomicBoolean stopped = new AtomicBoolean(false);
 
     public Controller(int r, String graphType){
-
-        //graph setup. should contain at least one node
         graph = new SingleGraph("MultiRobot");
-        createGraph2(graphType);
-        setGraph(0);
+        robots = new ArrayList<>();
 
-        //robot setup -startNode should not be null
-        this.robots = new ArrayList<>();
-        for (int i =0; i < r; i++) {
-            robots.add(new Robot(startNode));
-        }
-
-        stopped = new AtomicBoolean(false);
+        //graph-robot setup. should contain at least one node
+        init(graphType, r);
     }
-    public void reset(int r) throws Exception {
+    public synchronized void reset(int r) {
         //if (!isFinished() || stopped.get()) return;
+        paused = true;
         setGraph(0);
-        robots = new ArrayList<>();
+        robots.clear();
         for (int i =0; i < r; i++) {
             robots.add(new Robot(startNode));
         }
+        graph.getNodeSet().forEach(n -> n.removeAttribute("ui.label"));
+        setLabel(startNode);
 
         ticks=0;
-        stopped = new AtomicBoolean(false);
     }
-    public void reset(String graphType, int r){
-        graph = new SingleGraph("MultiRobot");
+    public synchronized void init(String graphType, int r){
+        paused = true;
+        //if (!isFinished() || stopped.get()) return;
         createGraph2(graphType);
-        setGraph(0);
-
-        robots = new ArrayList<>();
-        for (int i =0; i < r; i++) {
-            robots.add(new Robot(startNode));
-        }
-
-        ticks=0;
-        stopped = new AtomicBoolean(false);
+        reset(r);
     }
 
     @Override
@@ -126,7 +113,9 @@ public class Controller implements Runnable {
 
     private boolean edgesFinished () {
 
-        return graph.getEdgeSet().stream().allMatch(e -> e.hasAttribute("state") && e.getAttribute("state") == EdgeState.FINISHED);
+        boolean b =graph.getEdgeSet().stream().allMatch(e -> e.hasAttribute("state") && e.getAttribute("state") == EdgeState.FINISHED);
+
+        return b;
     }
 
     private void setLabel(Node node){
@@ -184,7 +173,7 @@ public class Controller implements Runnable {
         startNode.addAttribute("ui.style", "size: 20;");
 
         //add chalks
-        graph.getNodeSet().stream().forEach(n -> n.removeAttribute("chalks"));
+        //graph.getNodeSet().stream().forEach(n -> n.removeAttribute("chalks"));
         graph.getNodeSet().stream().forEach(n -> n.addAttribute("chalks", new ArrayList<Visit>()));
         //set edges to gray
         graph.getEdgeSet().forEach(e -> EdgeState.UNVISITED.setEdge(e) );
@@ -207,10 +196,14 @@ public class Controller implements Runnable {
     }
 
     private void createGraph2 (String graphType){
+        graph.clear();
         Generator gen;
         int depth =0;
         switch (graphType)
         {
+            case "Tutorial":
+                createGraph1();
+                return;
             case "Lobster":
                 gen = new LobsterGenerator();
                 depth = 100;
@@ -220,6 +213,7 @@ public class Controller implements Runnable {
                 gen = new RandomGenerator(4, false, false);
                 depth = 6;
                 break;
+
         }
         gen.addSink(graph);
         gen.begin();
