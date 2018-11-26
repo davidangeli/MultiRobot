@@ -12,7 +12,6 @@ public class Gui extends JFrame {
     private ViewPanel graphViewPanel;
 
     public Gui (Controller controller){
-
         this.controller = controller;
         this.addKeyListener(new keyHandler());
         this.addWindowListener(new WindowAdapter()
@@ -55,8 +54,9 @@ public class Gui extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     controller.reset((String)cmbGeneratorType.getSelectedItem(),Integer.parseInt(txtNumberOfRobots.getText()));
-                    split.remove(1);
-                    split.add(controller.getViewPanel());
+         //           split.remove(1);
+           //         split.add(controller.getViewPanel(),BorderLayout.SOUTH);
+                    split.setRightComponent(controller.getViewPanel());
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
@@ -75,7 +75,8 @@ public class Gui extends JFrame {
         settingsPanel.add(btnNextStep);
         this.graphViewPanel =controller.getViewPanel();
         split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,settingsPanel, graphViewPanel);
-        this.add(split);
+
+        this.add(split, BorderLayout.CENTER);
 
         //this.add(controller.getViewPanel(), BorderLayout.CENTER);
     }

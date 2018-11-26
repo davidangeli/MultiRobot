@@ -10,6 +10,7 @@ import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -155,6 +156,7 @@ public class Controller implements Runnable {
     }
 
     public ViewPanel getViewPanel(){
+        if (viewer != null) viewer.close();
         viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         viewer.enableAutoLayout();
         ViewPanel view = viewer.addDefaultView(false);
