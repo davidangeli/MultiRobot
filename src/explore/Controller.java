@@ -24,6 +24,7 @@ public class Controller implements Runnable {
     private int ticks=0;
     private Viewer viewer;
     private Thread t;
+    private Gui gui;
 
     public AtomicBoolean stopped = new AtomicBoolean(false);
 
@@ -34,6 +35,7 @@ public class Controller implements Runnable {
         //graph-robot setup. should contain at least one node
         init(graphType, r);
     }
+
     public synchronized void reset(int r) {
         //if (!isFinished() || stopped.get()) return;
         paused = true;
@@ -47,6 +49,7 @@ public class Controller implements Runnable {
 
         ticks=0;
     }
+
     public synchronized void init(String graphType, int r){
         paused = true;
         //if (!isFinished() || stopped.get()) return;
@@ -61,6 +64,11 @@ public class Controller implements Runnable {
         t = new Thread(this);
         t.start();
     }
+
+    public void setGui(Gui g){
+        this.gui=g;
+    }
+
     @Override
     public void run(){
 
@@ -77,7 +85,8 @@ public class Controller implements Runnable {
             } catch (InterruptedException ex) {
             }
         }
-        System.out.println("Controller thread is done.");
+        stopped.set(true);
+        System.out.println("Graph explored in " + ticks + " steps");
     }
 
     private synchronized void tick () {
@@ -112,6 +121,8 @@ public class Controller implements Runnable {
                 .map(Robot::getCurrentNode)
                 .distinct()
                 .forEach(n -> setLabel(n));
+
+        gui.setSteps(ticks);
     };
 
     private boolean isFinished(){
@@ -132,6 +143,7 @@ public class Controller implements Runnable {
                 .map(Robot::toString)
                 .collect(Collectors.joining(","));
         label = node.getId() + ": " + label;
+        node.setAttribute("ui.style", "text-size: 12px;");
 
         if (! paused){
             node.setAttribute("ui.label", label);

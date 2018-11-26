@@ -11,6 +11,7 @@ public class Gui extends JFrame {
     private JSplitPane split;
     private ViewPanel graphViewPanel;
     private keyHandler kH;
+    private JLabel lblSteps;
 
     public Gui (Controller controller){
         this.controller = controller;
@@ -59,6 +60,9 @@ public class Gui extends JFrame {
             controller.pause();
         });
 
+        //lépésszám
+        lblSteps = new JLabel("Lépésszám: ");
+
         settingsPanel.add(lblNumberOfRobots);
         settingsPanel.add(txtNumberOfRobots);
         settingsPanel.add(btnRestart);
@@ -66,6 +70,7 @@ public class Gui extends JFrame {
         settingsPanel.add(cmbGeneratorType);
         settingsPanel.add(btnNextStep);
         settingsPanel.add(btnPause);
+        settingsPanel.add(lblSteps);
 
         this.graphViewPanel =controller.getViewPanel();
         split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,settingsPanel, graphViewPanel);
@@ -74,6 +79,10 @@ public class Gui extends JFrame {
         this.add(split, BorderLayout.CENTER);
 
         //this.add(controller.getViewPanel(), BorderLayout.CENTER);
+    }
+
+    public void setSteps(int s){
+        lblSteps.setText("Lépésszám: " + s);
     }
 
     private class keyHandler implements KeyListener {
