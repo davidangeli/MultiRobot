@@ -14,7 +14,7 @@ public class Gui extends JFrame {
     private JLabel lblSteps;
 
     public Gui (Controller controller){
-        this.setTitle("Angeli-Ny√°ri Multi Robot Graph Exploration");
+        this.setTitle("Angeli-Ny·ri Multi Robot Graph Exploration");
         this.controller = controller;
         this.kH = new keyHandler();
         this.addKeyListener(kH);
@@ -33,19 +33,19 @@ public class Gui extends JFrame {
         JPanel settingsPanel = new JPanel();
         settingsPanel.addKeyListener(kH);
         //robotok szama
-        JLabel lblNumberOfRobots = new JLabel("Robotok sz√°ma");
+        JLabel lblNumberOfRobots = new JLabel("Robotok sz·ma");
         lblNumberOfRobots.addKeyListener(kH);
         String[] robotNumbers = new String[] {"1", "2", "3"};
         JComboBox<String> txtNumberOfRobots = new JComboBox<>(robotNumbers);
         //restart gomb
-        JButton btnRestart = new JButton("√öjraind√≠t");
+        JButton btnRestart = new JButton("˙jraindÌt");
         btnRestart.addKeyListener(kH);
         btnRestart.addActionListener(e -> {
             setSteps(0);
             controller.reset(Integer.parseInt((String)txtNumberOfRobots.getSelectedItem()));
         });
         //gener√°tor t√≠pus
-        JLabel lblGeneratorType = new JLabel("Gener√°tor t√≠pusa");
+        JLabel lblGeneratorType = new JLabel("Gener·tor tÌpusa");
         String[] genTypes = new String[] {"Tutorial", "Random", "Lobster"};
         JComboBox<String> cmbGeneratorType = new JComboBox<String>(genTypes);
         cmbGeneratorType.addActionListener(e -> {
@@ -54,7 +54,7 @@ public class Gui extends JFrame {
             split.setRightComponent(controller.getViewPanel());
         });
         //next
-        JButton btnNextStep = new JButton("K√∂vetkez≈ë l√©p√©s");
+        JButton btnNextStep = new JButton("Kˆvetkezı lÈpÈs");
         btnNextStep.addKeyListener(kH);
         btnNextStep.addActionListener(e -> controller.tickOne());
         //start-stop
@@ -66,7 +66,7 @@ public class Gui extends JFrame {
         });
 
         //l√©p√©ssz√°m
-        lblSteps = new JLabel("L√©p√©ssz√°m: ");
+        lblSteps = new JLabel("LÈpÈssz·m: ");
 
         settingsPanel.add(lblNumberOfRobots);
         settingsPanel.add(txtNumberOfRobots);
@@ -87,7 +87,7 @@ public class Gui extends JFrame {
     }
 
     public void setSteps(int s){
-        lblSteps.setText("L√©p√©ssz√°m: " + s);
+        lblSteps.setText("LÈpÈssz·m: " + s);
     }
 
     private class keyHandler implements KeyListener {

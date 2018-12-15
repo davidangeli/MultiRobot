@@ -7,10 +7,8 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.swingViewer.ViewPanel;
-import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
